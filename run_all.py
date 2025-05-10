@@ -48,3 +48,4 @@ bytes_Z = Z50.astype("float32").nbytes
 compression = 100 * (1 - bytes_Z/bytes_full)
 print(f"[INFO] Compression ratio at k=50 = {compression:.1f}%")
 pd.DataFrame({"compression_percent":[compression]}).to_csv("compression.csv",index=False)
+

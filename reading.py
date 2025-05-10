@@ -38,3 +38,30 @@ print(f"\nDROP_VAL (accuracy drop at ε=0.3) : {drop:.1f}")
 compression = comp_df.iloc[0, 0]
 print(f"COMPRESSION_VAL (memory saved %)  : {compression:.1f}")
 
+
+# other values
+
+var_pct  = tfidf["var"] * 100
+acc_pct  = tfidf["acc"] * 100
+err_pct  = tfidf["err"] * 100
+
+acc0   = noise_df.loc[noise_df.eps == 0.0, "acc"].iloc[0]
+acc30  = noise_df.loc[noise_df.eps == 0.3, "acc"].iloc[0]
+drop30 = (acc0 - acc30) * 100      # absolute percentage points
+
+# --- pretty print -----------------------------------------------------------
+print(f"VARIANCE_PERCENT  -> {var_pct:.1f}")
+print(f"ACCURACY_PERCENT  -> {acc_pct:.1f}")
+print(f"ERROR_PERCENT     -> {err_pct:.1f}")
+print(f"DROP_AT_0p3_eps   -> {drop30:.1f}  # accuracy drop at ε=0.3")
+
+print("\nText example:")
+print(f"Tf–idf at $k = 100$ achieves the strongest performance, "
+      f"capturing {var_pct:.1f}\\% variance, reaching "
+      f"{acc_pct:.1f}\\% accuracy, and keeping reconstruction error to "
+      f"{err_pct:.1f}\\%. "
+      f"Accuracy declines by only {drop30:.1f}\\% when 30\\% of tokens "
+      "are removed.")
+
+compression = comp_df.iloc[0, 0]
+print(f"\nCOMPRESSION_PERCENT = {compression:.1f}")

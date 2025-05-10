@@ -1,3 +1,3 @@
 """
-LSA Optimization package
+LSA Optimization 
 """ 
