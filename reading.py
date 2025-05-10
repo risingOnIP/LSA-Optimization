@@ -56,7 +56,7 @@ print(f"ERROR_PERCENT     -> {err_pct:.1f}")
 print(f"DROP_AT_0p3_eps   -> {drop30:.1f}  # accuracy drop at ε=0.3")
 
 print("\nText example:")
-print(f"Tf–idf at $k = 100$ achieves the strongest performance, "
+print(f"Tf-idf at $k = 100$ achieves the strongest performance, "
       f"capturing {var_pct:.1f}\\% variance, reaching "
       f"{acc_pct:.1f}\\% accuracy, and keeping reconstruction error to "
       f"{err_pct:.1f}\\%. "
