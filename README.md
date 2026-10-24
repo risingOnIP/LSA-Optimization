@@ -146,8 +146,8 @@ Accuracy falls steadily as the token dropout rate increases from 0% to 50%, with
 1. Clone the repository.
 
    ```bash
-   git clone https://github.com/risingOnIP/LSA-Optimization.git
-   cd LSA-Optimization
+   git clone https://github.com/risingOnIP/lsa-optimization.git
+   cd lsa-optimization
    ```
 
 2. Create a virtual environment and install the dependencies.
@@ -179,7 +179,7 @@ To change the experiment grid, edit `ks` (ranks) or `eps_list` (token dropout ra
 ## Project Structure
 
 ```text
-LSA-Optimization/
+lsa-optimization/
 ├── src/
 │   ├── data_loader.py     # download and load 20 Newsgroups
 │   ├── preprocess.py      # tokenizer and count matrix
