@@ -1,5 +1,10 @@
-"""Term weighting schemes applied to a sparse document-term count matrix."""
+"""Term weighting schemes applied to a sparse document-term count matrix.
 
+``WEIGHTINGS`` maps the canonical display name of each scheme (the name used
+in the CSV files, console output, figures, and README) to its function.
+"""
+
+import re
 import numpy as np
 from sklearn.feature_extraction.text import TfidfTransformer
 
@@ -35,3 +40,15 @@ def tf_log_entropy(X):
     row_norm[row_norm == 0] = 1
     Xw = Xw.multiply(1/row_norm)
     return Xw
+
+
+WEIGHTINGS = {
+    "Raw counts": tf_raw,
+    "TF-IDF": tf_tfidf,
+    "Log-entropy": tf_log_entropy,
+}
+
+
+def file_slug(name):
+    """Return the file-name form of a weighting name, for example ``log_entropy``."""
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")

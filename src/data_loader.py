@@ -12,7 +12,7 @@ def fetch_20ng(local_dir: Path) -> pd.DataFrame:
     with a ``text`` column and an integer ``label`` column.
     """
     local_dir.mkdir(parents=True, exist_ok=True)
-    print("Downloading / loading 20 Newsgroups corpus …")
+    print("Loading 20 Newsgroups corpus (downloaded on first run)...")
     data = fetch_20newsgroups(subset="all",
                               remove=("headers", "footers", "quotes"),
                               data_home=str(local_dir))
