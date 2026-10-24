@@ -23,7 +23,7 @@ print(stage1.to_string(index=False))
 
 tfidf = stage1.loc[stage1.weight == "tfidf"].iloc[0]
 
-print("\n=== Headline metrics for TF–IDF @ k=100 ===")
+print("\n=== Headline metrics for TF-IDF @ k=100 ===")
 print(f"VAR_VAL  (variance %)        : {tfidf['var']*100:.1f}")
 print(f"ERR_VAL  (recon error %)     : {tfidf['err']*100:.1f}")
 print(f"ACC_VAL  (1-NN accuracy %)   : {tfidf['acc']*100:.1f}")
