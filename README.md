@@ -197,7 +197,8 @@ lsa-optimization/
 ├── metrics_noise.csv      # token dropout results at k = 100
 ├── compression.csv        # embedding size reduction at k = 50
 ├── requirements.txt
-└── LICENSE
+├── LICENSE
+└── README.md
 ```
 
 ## Notes
