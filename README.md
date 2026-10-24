@@ -49,14 +49,14 @@ flowchart LR
     metrics -->|"plot"| figures
     metrics -->|"write"| csv["CSV Results"]
     csv -->|"summarize"| report["Reading Script"]
-    class preprocess,weighting,svd,metrics,figures,csv,report core
-    class dropout threat
-    class corpus external
     classDef core fill:#2563EB,stroke:#1E40AF,color:#FFFFFF
     classDef guard fill:#15803D,stroke:#166534,color:#FFFFFF
     classDef threat fill:#B45309,stroke:#92400E,color:#FFFFFF
     classDef infra fill:#374151,stroke:#111827,color:#FFFFFF
     classDef external fill:#F3F4F6,stroke:#6B7280,color:#111827
+    class preprocess,weighting,svd,metrics,figures,csv,report core
+    class dropout threat
+    class corpus external
 ```
 
 1. **Load:** `src/data_loader.py` downloads 20 Newsgroups through scikit-learn and caches it in `data/`.
