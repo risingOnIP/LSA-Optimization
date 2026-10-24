@@ -1,51 +1,45 @@
+"""Run all three experiment stages and write the CSV results and figures.
+
+Usage: python run_all.py
+"""
+
+import pandas as pd
 from pathlib import Path
-import matplotlib.pyplot as plt, pandas as pd
-from src import experiments, weighting, metrics
+from src import experiments, weighting, lsa, viz
 
-# Stage 1 -----------------------------------------------------------------
-X, df, best = experiments.stage1_weight_compare()
-best_func = {"raw": weighting.tf_raw,
-             "tfidf": weighting.tf_tfidf,
-             "logE": weighting.tf_log_entropy}[best]
-X_best = best_func(X)
+FIGS = Path("figs")
 
-# Stage 2 -----------------------------------------------------------------
-ks = [10,25,50,100,200]
-rank_df = experiments.stage2_rank_sweep(X_best, df.label.values, ks)
 
-# quick plots
-plt.figure(); plt.plot(rank_df["k"], rank_df["var"], "o-")
-plt.xlabel("k"); plt.ylabel("variance explained")
-plt.tight_layout(); fn="figs/fig2_var.png"; plt.savefig(fn,dpi=300); plt.close()
-print(f"[FIGURE] Saved {fn} – variance explained vs rank.")
+def main():
+    """Run stages 1 to 3, save figures, and compute compression at the best rank."""
+    # Stage 1: compare weightings at k = 100 and pick the best by 1-NN accuracy
+    X, df, best = experiments.stage1_weight_compare()
+    X_best = weighting.WEIGHTINGS[best](X)
 
-plt.figure(); plt.plot(rank_df["k"], rank_df["err"], "o-")
-plt.xlabel("k"); plt.ylabel("reconstruction error")
-plt.tight_layout(); fn="figs/fig2_err.png"; plt.savefig(fn,dpi=300); plt.close()
-print(f"[FIGURE] Saved {fn} – reconstruction error vs rank.")
+    # Stage 2: rank sweep for the best weighting
+    ks = [10,25,50,100,200]
+    rank_df = experiments.stage2_rank_sweep(X_best, df.label.values, ks, best)
+    best_k = int(rank_df.loc[rank_df["acc"].idxmax(), "k"])
 
-plt.figure(); plt.plot(rank_df["k"], rank_df["acc"], "o-")
-plt.xlabel("k"); plt.ylabel("1-NN accuracy")
-plt.tight_layout(); fn="figs/fig2_acc.png"; plt.savefig(fn,dpi=300); plt.close()
-print(f"[FIGURE] Saved {fn} – 1-NN accuracy vs rank.")
+    viz.rank_plot(rank_df, "var", "Variance explained", best, FIGS/"fig2_var.png")
+    viz.rank_plot(rank_df, "err", "Reconstruction error", best, FIGS/"fig2_err.png")
+    viz.rank_plot(rank_df, "acc", "1-NN accuracy", best, FIGS/"fig2_acc.png")
 
-# Stage 3 -----------------------------------------------------------------
-noise_df = experiments.stage3_noise(X_best, df.label.values, k=100,
-                                    eps_list=[0,0.1,0.2,0.3,0.4,0.5])
+    # Stage 3: token dropout robustness at the Stage 1 rank
+    noise_df = experiments.stage3_noise(X_best, df.label.values,
+                                        k=experiments.COMPARE_K,
+                                        eps_list=[0,0.1,0.2,0.3,0.4,0.5],
+                                        name=best)
+    viz.noise_plot(noise_df, best, experiments.COMPARE_K, FIGS/"fig3_noise.png")
 
-plt.figure(); plt.plot(noise_df.eps, noise_df.acc, "o-")
-plt.xlabel("dropout ε"); plt.ylabel("1-NN accuracy")
-plt.tight_layout(); fn="figs/fig3_noise.png"; plt.savefig(fn, dpi=300); plt.close()
-print(f"[FIGURE] Saved {fn} – accuracy vs token-dropout.")
+    # Compression: float32 embedding at the best rank vs the non-zero values of the raw count matrix
+    bytes_full = X.data.nbytes
+    svd_best, Z_best = lsa.lsa(X_best, best_k)
+    bytes_Z = Z_best.astype("float32").nbytes
+    compression = 100 * (1 - bytes_Z/bytes_full)
+    print(f"[INFO] Compression of the {best} embedding at k = {best_k}: {compression:.1f}%")
+    pd.DataFrame({"compression_percent":[compression]}).to_csv("compression.csv",index=False)
 
-# Compression ratio -------------------------------------------------------
-bytes_full = X.data.nbytes
-_, Z50 = weighting.tf_tfidf(X).shape, None  # placeholder
-# Actually recompute Z for k=50
-from src import lsa
-svd50, Z50 = lsa.lsa(X_best, 50)
-bytes_Z = Z50.astype("float32").nbytes
-compression = 100 * (1 - bytes_Z/bytes_full)
-print(f"[INFO] Compression ratio at k=50 = {compression:.1f}%")
-pd.DataFrame({"compression_percent":[compression]}).to_csv("compression.csv",index=False)
 
+if __name__ == "__main__":
+    main()

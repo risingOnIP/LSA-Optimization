@@ -1,14 +1,32 @@
-import numpy as np, scipy.sparse as sp
+"""Term weighting schemes applied to a sparse document-term count matrix.
+
+``WEIGHTINGS`` maps the canonical display name of each scheme (the name used
+in the CSV files, console output, figures, and README) to its function.
+"""
+
+import re
+import numpy as np
 from sklearn.feature_extraction.text import TfidfTransformer
 
-def tf_raw(X):               # no change
+
+def tf_raw(X):
+    """Return an unweighted copy of the raw count matrix."""
     return X.copy()
 
+
 def tf_tfidf(X):
+    """Apply TF-IDF weighting with L2 row normalization."""
     tfidf = TfidfTransformer(norm="l2", use_idf=True)
     return tfidf.fit_transform(X)
 
+
 def tf_log_entropy(X):
+    """Apply log-entropy weighting with L2 row normalization.
+
+    The local weight is ``log(1 + count)``. The global weight of each term is
+    ``1 + sum_d p log p / log(n_docs)``, where ``p`` is the share of the
+    term's total count that falls in document ``d``.
+    """
     df = np.array(X.sum(axis=0)).ravel()
     p = X.multiply(1/df)                 # P(d|t)
     logp = p.copy();  logp.data = np.log(logp.data+1e-10)
@@ -22,3 +40,15 @@ def tf_log_entropy(X):
     row_norm[row_norm == 0] = 1
     Xw = Xw.multiply(1/row_norm)
     return Xw
+
+
+WEIGHTINGS = {
+    "Raw counts": tf_raw,
+    "TF-IDF": tf_tfidf,
+    "Log-entropy": tf_log_entropy,
+}
+
+
+def file_slug(name):
+    """Return the file-name form of a weighting name, for example ``log_entropy``."""
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")

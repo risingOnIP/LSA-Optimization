@@ -1,67 +1,73 @@
-"""
-Run only after run_all.py has generated the CSVs.
+"""Print the headline numbers and a LaTeX-ready summary sentence from the result CSVs.
+
+Run after run_all.py has written the CSVs. The best configuration combines the
+weighting with the highest 1-NN accuracy in Stage 1 (metrics_stage1.csv) and the
+rank k with the highest 1-NN accuracy in Stage 2 (metrics_ranks.csv).
 """
 
 import pandas as pd
 from pathlib import Path
 
-# ------------------------------------------------------------------
+# Rank used by Stage 1 and Stage 3 in run_all.py (experiments.COMPARE_K)
+COMPARE_K = 100
+
+
 def require(file):
+    """Load a result CSV, or explain how to generate it if it is missing."""
     if not Path(file).exists():
         raise FileNotFoundError(
-            f"{file} not found.  Run `python run_all.py` first.")
+            f"{file} not found. Run `python run_all.py` first.")
     return pd.read_csv(file)
 
-stage1   = require("metrics_stage1.csv")   # weighting comparison
-rank_df  = require("metrics_ranks.csv")    # sweep over k
-noise_df = require("metrics_noise.csv")    # noise robustness
-comp_df  = require("compression.csv")      # compression %
 
-# ------------------------------------------------------------------
-print("\n=== Table 1 values (k = 100) ===")
-print(stage1.to_string(index=False))
+def main():
+    """Print the result tables, the best configuration, and the summary sentence."""
+    stage1   = require("metrics_stage1.csv")   # weighting comparison
+    rank_df  = require("metrics_ranks.csv")    # sweep over k
+    noise_df = require("metrics_noise.csv")    # token dropout robustness
+    comp_df  = require("compression.csv")      # compression %
 
-tfidf = stage1.loc[stage1.weight == "tfidf"].iloc[0]
+    print(f"\n=== Stage 1: term weighting at k = {COMPARE_K} (metrics_stage1.csv) ===")
+    print(stage1.to_string(index=False))
 
-print("\n=== Headline metrics for TF–IDF @ k=100 ===")
-print(f"VAR_VAL  (variance %)        : {tfidf['var']*100:.1f}")
-print(f"ERR_VAL  (recon error %)     : {tfidf['err']*100:.1f}")
-print(f"ACC_VAL  (1-NN accuracy %)   : {tfidf['acc']*100:.1f}")
+    ranked = stage1.sort_values("acc", ascending=False)
+    best, runner_up = ranked.iloc[0], ranked.iloc[1]
+    name = best["weight"]
+    margin = (best["acc"] - runner_up["acc"]) * 100
 
-# ------------------------------------------------------------------
-acc0  = noise_df.loc[noise_df.eps == 0,   "acc"].iloc[0]
-acc03 = noise_df.loc[noise_df.eps == 0.3, "acc"].iloc[0]
-drop  = (acc0 - acc03) * 100
+    print(f"\n=== Stage 2: rank sweep for {name} (metrics_ranks.csv) ===")
+    print(rank_df.to_string(index=False))
 
-print(f"\nDROP_VAL (accuracy drop at ε=0.3) : {drop:.1f}")
+    top = rank_df.loc[rank_df["acc"].idxmax()]
+    k = int(top["k"])
+    var_pct, err_pct, acc_pct = top["var"] * 100, top["err"] * 100, top["acc"] * 100
 
-compression = comp_df.iloc[0, 0]
-print(f"COMPRESSION_VAL (memory saved %)  : {compression:.1f}")
+    acc0   = noise_df.loc[noise_df.eps == 0.0, "acc"].iloc[0]
+    acc30  = noise_df.loc[noise_df.eps == 0.3, "acc"].iloc[0]
+    drop30 = (acc0 - acc30) * 100      # absolute percentage points
+
+    compression = comp_df.iloc[0, 0]
+
+    print(f"\n=== Best configuration: {name} at k = {k} ===")
+    headline = [
+        ("Variance explained (%)", f"{var_pct:.1f}"),
+        ("Reconstruction error (%)", f"{err_pct:.1f}"),
+        ("1-NN accuracy (%)", f"{acc_pct:.1f}"),
+        (f"Compression at k = {k} (%)", f"{compression:.1f}"),
+        (f"Margin over {runner_up['weight']} at k = {COMPARE_K} (points)", f"{margin:.1f}"),
+        (f"Drop at 30% token dropout, k = {COMPARE_K} (points)", f"{drop30:.1f}"),
+    ]
+    width = max(len(label) for label, _ in headline)
+    for label, value in headline:
+        print(f"{label.ljust(width)} : {value}")
+
+    print("\nText example:")
+    print(f"{name} weighting at $k = {k}$ achieves the strongest performance, "
+          f"reaching {acc_pct:.1f}\\% 1-NN accuracy with an embedding "
+          f"{compression:.1f}\\% smaller than the non-zero values of the raw "
+          f"count matrix. At $k = {COMPARE_K}$, accuracy declines by only "
+          f"{drop30:.1f} percentage points when 30\\% of tokens are removed.")
 
 
-# other values
-
-var_pct  = tfidf["var"] * 100
-acc_pct  = tfidf["acc"] * 100
-err_pct  = tfidf["err"] * 100
-
-acc0   = noise_df.loc[noise_df.eps == 0.0, "acc"].iloc[0]
-acc30  = noise_df.loc[noise_df.eps == 0.3, "acc"].iloc[0]
-drop30 = (acc0 - acc30) * 100      # absolute percentage points
-
-# --- pretty print -----------------------------------------------------------
-print(f"VARIANCE_PERCENT  -> {var_pct:.1f}")
-print(f"ACCURACY_PERCENT  -> {acc_pct:.1f}")
-print(f"ERROR_PERCENT     -> {err_pct:.1f}")
-print(f"DROP_AT_0p3_eps   -> {drop30:.1f}  # accuracy drop at ε=0.3")
-
-print("\nText example:")
-print(f"Tf-idf at $k = 100$ achieves the strongest performance, "
-      f"capturing {var_pct:.1f}\\% variance, reaching "
-      f"{acc_pct:.1f}\\% accuracy, and keeping reconstruction error to "
-      f"{err_pct:.1f}\\%. "
-      f"Accuracy declines by only {drop30:.1f}\\% when 30\\% of tokens "
-      "are removed.")
-
-compression = comp_df.iloc[0, 0]
-print(f"\nCOMPRESSION_PERCENT = {compression:.1f}")
+if __name__ == "__main__":
+    main()
