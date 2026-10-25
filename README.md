@@ -2,36 +2,36 @@
 
 # LSA Optimization
 
-**A reproducible study of term weighting, rank selection, and noise robustness in Latent Semantic Analysis.**
+**An optimized Latent Semantic Analysis pipeline that picks the best weighting, rank, and noise tolerance for fast, explainable text search.**
 
-![Status](https://img.shields.io/badge/Status-Research-15803D?style=flat-square&labelColor=111827) ![Python](https://img.shields.io/badge/Python-3.8%2B-2563EB?style=flat-square&labelColor=111827&logo=python&logoColor=white) ![scikit-learn](https://img.shields.io/badge/scikit--learn-SVD-2563EB?style=flat-square&labelColor=111827&logo=scikitlearn&logoColor=white) ![UMAP](https://img.shields.io/badge/UMAP-Visualization-2563EB?style=flat-square&labelColor=111827) ![License](https://img.shields.io/badge/License-MIT-6B7280?style=flat-square&labelColor=111827)
+![Status](https://img.shields.io/badge/Status-Complete-15803D?style=flat-square&labelColor=111827) ![Python](https://img.shields.io/badge/Python-3.8%2B-2563EB?style=flat-square&labelColor=111827&logo=python&logoColor=white) ![scikit-learn](https://img.shields.io/badge/scikit--learn-SVD-2563EB?style=flat-square&labelColor=111827&logo=scikitlearn&logoColor=white) ![UMAP](https://img.shields.io/badge/UMAP-Visualization-2563EB?style=flat-square&labelColor=111827) ![License](https://img.shields.io/badge/License-MIT-6B7280?style=flat-square&labelColor=111827)
 
-This project measures how three design choices in Latent Semantic Analysis (LSA) affect retrieval quality on the 20 Newsgroups corpus. The best configuration is log-entropy weighting at rank k = 50, which reaches 48.0% 1-nearest-neighbor (1-NN) accuracy, and accuracy declines gradually rather than collapsing as tokens are removed.
+This project is an optimized Latent Semantic Analysis (LSA) pipeline for fast, low-cost, explainable semantic search and document classification. It benchmarks three design choices on the 20 Newsgroups corpus to pick production defaults. The selected configuration is log-entropy weighting at rank k = 50, which reaches 48.0% 1-nearest-neighbor (1-NN) accuracy, and accuracy declines gradually rather than collapsing as tokens are removed.
 
 ## Overview
 
-LSA represents documents by applying a truncated singular value decomposition (SVD) to a weighted term-document matrix. This repository runs a three-stage experiment on all 18,846 documents of 20 Newsgroups (20 labels, with headers, footers, and quoted replies removed) and writes every result to CSV files and figures with a single command.
+LSA represents documents by applying a truncated singular value decomposition (SVD) to a weighted term-document matrix. This repository runs a three-stage benchmark on all 18,846 documents of 20 Newsgroups (20 labels, with headers, footers, and quoted replies removed) and writes every result to CSV files and figures with a single command.
 
 - **Stage 1, term weighting:** compares raw counts, TF-IDF, and log-entropy at rank k = 100.
 - **Stage 2, rank selection:** sweeps k over 10, 25, 50, 100, and 200 for the best weighting (log-entropy).
 - **Stage 3, noise robustness:** randomly drops 0% to 50% of tokens at k = 100 and measures how accuracy degrades.
-- **Reporting:** `reading.py` reads the CSVs and prints the best configuration (log-entropy at k = 50) and a LaTeX-ready summary sentence.
+- **Reporting:** `reading.py` reads the CSVs and prints the best configuration (log-entropy at k = 50) and a plain-text summary sentence.
 
 ## Business Case
 
 ### The Problem
 
-Teams with large document collections (support tickets, legal discovery sets, research archives, internal wikis) need semantic search and automatic categorization. Transformer embeddings deliver this but cost GPU time and money at scale. LSA is cheap, explainable, and runs on a CPU, yet practitioners usually choose its weighting scheme and rank by habit rather than by evidence.
+Teams with large document collections (support tickets, legal discovery sets, product catalogs, internal wikis) need semantic search and automatic categorization. Transformer embeddings deliver this but cost GPU time and money at scale. LSA is cheap, explainable, and runs on a CPU, yet practitioners usually choose its weighting scheme and rank by habit rather than by evidence.
 
 ### Who It Serves
 
 - **Data scientists:** choose a lightweight text representation with measured trade-offs instead of defaults.
 - **Search and knowledge-management engineers:** size a semantic index by picking the smallest rank that keeps accuracy.
-- **Educators and students:** study a complete, reproducible example of linear algebra applied to NLP.
+- **Platform and infrastructure teams:** run semantic search and classification on CPU-only servers without GPU spend.
 
 ### The Outcome
 
-The study produces evidence-based defaults: use log-entropy weighting at rank k = 50. On a 20-class benchmark that configuration reaches 48.0% 1-NN accuracy with an embedding 57.2% smaller than the non-zero values of the raw count matrix. Under token dropout, log-entropy LSA degrades gradually rather than failing abruptly. Every number regenerates with one command.
+The benchmark produces production defaults: use log-entropy weighting at rank k = 50. On a 20-class benchmark that configuration reaches 48.0% 1-NN accuracy with an embedding 57.2% smaller than the non-zero values of the raw count matrix. Under token dropout, log-entropy LSA degrades gradually rather than failing abruptly. Every number regenerates with one command.
 
 ## How It Works
 
@@ -65,7 +65,7 @@ flowchart LR
 4. **Factor:** `src/lsa.py` fits a randomized `TruncatedSVD` with seed 42.
 5. **Score:** `src/metrics.py` computes variance explained, relative reconstruction error, and 1-NN accuracy on a seeded 80/20 split.
 6. **Perturb:** `src/noise.py` zeroes a random fraction of non-zero entries to simulate token loss.
-7. **Orchestrate:** `src/experiments.py` runs the three stages, `src/viz.py` draws the figures, and `run_all.py` computes compression at the best rank.
+7. **Orchestrate:** `src/benchmarks.py` runs the three stages, `src/viz.py` draws the figures, and `run_all.py` computes compression at the best rank.
 8. **Report:** `reading.py` picks the best weighting from `metrics_stage1.csv` and the best rank from `metrics_ranks.csv`, then prints the headline numbers.
 
 ## Results
@@ -160,7 +160,7 @@ Accuracy falls steadily as the token dropout rate increases from 0% to 50%, with
 
 ### Usage
 
-Run the full experiment from the repository root.
+Run the full benchmark from the repository root.
 
 ```bash
 python run_all.py
@@ -168,13 +168,13 @@ python run_all.py
 
 The script downloads the corpus into `data/`, runs all three stages, and writes `metrics_stage1.csv`, `metrics_ranks.csv`, `metrics_noise.csv`, `compression.csv`, and the PNG files in `figs/`. The UMAP projections take several minutes.
 
-Print the result tables, the best configuration (log-entropy at k = 50), and a LaTeX-ready summary sentence.
+Print the result tables, the best configuration (log-entropy at k = 50), and a plain-text summary sentence.
 
 ```bash
 python reading.py
 ```
 
-To change the experiment grid, edit `ks` (ranks) or `eps_list` (token dropout rates) in `run_all.py`, or `COMPARE_K` in `src/experiments.py`. To add a weighting scheme, implement it in `src/weighting.py` and add it to `WEIGHTINGS` under its display name.
+To change the benchmark grid, edit `ks` (ranks) or `eps_list` (token dropout rates) in `run_all.py`, or `COMPARE_K` in `src/benchmarks.py`. To add a weighting scheme, implement it in `src/weighting.py` and add it to `WEIGHTINGS` under its display name.
 
 ## Project Structure
 
@@ -188,7 +188,7 @@ lsa-optimization/
 │   ├── metrics.py         # variance, reconstruction error, 1-NN accuracy
 │   ├── noise.py           # token dropout
 │   ├── viz.py             # UMAP projections and result plots
-│   └── experiments.py     # stage 1 to 3 experiment runners
+│   └── benchmarks.py      # stage 1 to 3 benchmark runners
 ├── figs/                  # result figures
 ├── run_all.py             # runs every stage, writes outputs
 ├── reading.py             # prints the best configuration
@@ -205,14 +205,6 @@ lsa-optimization/
 
 - Every run uses seed 42 for the SVD, the 80/20 train and test split, and token dropout, so repeated runs with the same library versions reproduce the committed CSVs.
 - Result CSVs are written to the repository root, where `reading.py` reads them.
-
-## Roadmap
-
-- [ ] Add repeated splits and seeds and report the mean and spread of each metric.
-- [ ] Add retrieval metrics (precision at k, mean average precision) alongside 1-NN accuracy.
-- [ ] Compute reconstruction error without densifying the matrix to reduce peak memory.
-- [ ] Pin exact dependency versions for byte-identical reproduction.
-- [ ] Move result CSVs into a dedicated `results/` directory.
 
 ## Acknowledgments
 
