@@ -67,12 +67,12 @@
   <rect width="1280" height="320" rx="18" fill="url(#fade)" fill-opacity="0.85"/>
   <rect x="0" y="56" width="8" height="208" fill="#15803D"/>
   <text x="72" y="128" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="58" font-weight="700" fill="#F9FAFB">LSA Optimization</text>
-  <text x="72" y="176" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" fill="#CBD5E1">A reproducible study of term weighting, rank selection, and</text>
-  <text x="72" y="208" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" fill="#CBD5E1">noise robustness in Latent Semantic Analysis.</text>
-  <rect x="72" y="248" width="109" height="32" rx="16" fill="#15803D" fill-opacity="0.18" stroke="#15803D" stroke-width="1.5"/>
-  <text x="126.5" y="269" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.2" fill="#F9FAFB">RESEARCH</text>
-  <rect x="193" y="248" width="62" height="32" rx="16" fill="#2563EB" fill-opacity="0.18" stroke="#2563EB" stroke-width="1.5"/>
-  <text x="224.0" y="269" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.2" fill="#F9FAFB">NLP</text>
-  <rect x="267" y="248" width="231" height="32" rx="16" fill="#2563EB" fill-opacity="0.18" stroke="#2563EB" stroke-width="1.5"/>
-  <text x="382.5" y="269" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.2" fill="#F9FAFB">INFORMATION RETRIEVAL</text>
+  <text x="72" y="176" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" fill="#CBD5E1">An optimized Latent Semantic Analysis pipeline that picks the best</text>
+  <text x="72" y="208" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" fill="#CBD5E1">weighting, rank, and noise tolerance for fast, explainable text search.</text>
+  <rect x="72" y="248" width="184" height="32" rx="16" fill="#15803D" fill-opacity="0.18" stroke="#15803D" stroke-width="1.5"/>
+  <text x="164.0" y="269" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.2" fill="#F9FAFB">MACHINE LEARNING</text>
+  <rect x="268" y="248" width="62" height="32" rx="16" fill="#2563EB" fill-opacity="0.18" stroke="#2563EB" stroke-width="1.5"/>
+  <text x="299.0" y="269" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.2" fill="#F9FAFB">NLP</text>
+  <rect x="342" y="248" width="175" height="32" rx="16" fill="#2563EB" fill-opacity="0.18" stroke="#2563EB" stroke-width="1.5"/>
+  <text x="429.5" y="269" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.2" fill="#F9FAFB">SEMANTIC SEARCH</text>
 </svg>
