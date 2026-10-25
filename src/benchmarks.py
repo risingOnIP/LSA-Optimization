@@ -1,4 +1,4 @@
-"""The three experiment stages: weighting comparison, rank sweep, and noise robustness.
+"""The three benchmark stages: weighting comparison, rank sweep, and noise robustness.
 
 Each stage writes its metrics to a CSV file in the working directory. Weightings
 are identified by their canonical names in ``weighting.WEIGHTINGS``.

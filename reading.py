@@ -1,4 +1,4 @@
-"""Print the headline numbers and a LaTeX-ready summary sentence from the result CSVs.
+"""Print the headline numbers and a plain-text summary sentence from the result CSVs.
 
 Run after run_all.py has written the CSVs. The best configuration combines the
 weighting with the highest 1-NN accuracy in Stage 1 (metrics_stage1.csv) and the
@@ -8,7 +8,7 @@ rank k with the highest 1-NN accuracy in Stage 2 (metrics_ranks.csv).
 import pandas as pd
 from pathlib import Path
 
-# Rank used by Stage 1 and Stage 3 in run_all.py (experiments.COMPARE_K)
+# Rank used by Stage 1 and Stage 3 in run_all.py (benchmarks.COMPARE_K)
 COMPARE_K = 100
 
 
@@ -61,12 +61,12 @@ def main():
     for label, value in headline:
         print(f"{label.ljust(width)} : {value}")
 
-    print("\nText example:")
-    print(f"{name} weighting at $k = {k}$ achieves the strongest performance, "
-          f"reaching {acc_pct:.1f}\\% 1-NN accuracy with an embedding "
-          f"{compression:.1f}\\% smaller than the non-zero values of the raw "
-          f"count matrix. At $k = {COMPARE_K}$, accuracy declines by only "
-          f"{drop30:.1f} percentage points when 30\\% of tokens are removed.")
+    print("\nSummary:")
+    print(f"{name} weighting at k = {k} achieves the strongest performance, "
+          f"reaching {acc_pct:.1f}% 1-NN accuracy with an embedding "
+          f"{compression:.1f}% smaller than the non-zero values of the raw "
+          f"count matrix. At k = {COMPARE_K}, accuracy declines by only "
+          f"{drop30:.1f} percentage points when 30% of tokens are removed.")
 
 
 if __name__ == "__main__":
