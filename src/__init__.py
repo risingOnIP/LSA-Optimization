@@ -1,1 +1,1 @@
-"""LSA Optimization: term weighting, rank, and noise experiments for Latent Semantic Analysis."""
+"""LSA Optimization: an optimized Latent Semantic Analysis pipeline with term weighting, rank, and noise benchmarks."""
